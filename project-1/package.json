@@ -1,0 +1,18 @@
+{
+  "name": "project-1",
+  "version": "1.0.0",
+  "description": "This project comprises of a web tier deployed on AWS EC2 (t2.micro) & it  will receive face recognition requests from clients and return the classification results to the clients. ",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "keywords": [
+    "cloud"
+  ],
+  "author": "Manideep",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
+  }
+}
