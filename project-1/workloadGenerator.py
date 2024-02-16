@@ -34,27 +34,30 @@ wrong_predictions = 0
 
 
 def send_one_request(image_path):
-    global prediction_df, responses, err_responses, correct_predictions, wrong_predictions
-    # Define http payload, "myfile" is the key of the http payload
-    file = {"inputFile": open(image_path, 'rb')}
-    response = requests.post(url, files=file)
+    try:
+        global prediction_df, responses, err_responses, correct_predictions, wrong_predictions
+        # Define http payload, "myfile" is the key of the http payload
+        file = {"inputFile": open(image_path, 'rb')}
+        response = requests.post(url, files=file)
 
-    # Print error message if failed
-    if response.status_code != 200:
-        print('sendErr: '+r.url)
-        err_responses += 1
-    else:
-        filename = image_path.split('/')[-1]
-        image_msg = filename + ' uploaded!'
-        msg = image_msg + '\n' + 'Classification result: ' + response.text
-        print(msg)
-        responses += 1
-        correct_result = prediction_df.loc[prediction_df['Image'] == filename.split('.')[
-            0], 'Results'].iloc[0]
-        if correct_result == response.text.split(':')[1]:
-            correct_predictions += 1
+        # Print error message if failed
+        if response.status_code != 200:
+            print('sendErr: '+r.url)
+            err_responses += 1
         else:
-            wrong_predictions += 1
+            filename = image_path.split('/')[-1]
+            image_msg = filename + ' uploaded!'
+            msg = image_msg + '\n' + 'Classification result: ' + response.text
+            print(msg)
+            responses += 1
+            correct_result = prediction_df.loc[prediction_df['Image'] == filename.split('.')[
+                0], 'Results'].iloc[0]
+            if correct_result == response.text.split(':')[1]:
+                correct_predictions += 1
+            else:
+                wrong_predictions += 1
+    except Exception as e:
+        print(e)
 
 
 num_max_workers = 100
