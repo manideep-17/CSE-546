@@ -132,3 +132,5 @@ dist
 # mac os
 .DS_Store
 *.jpg
+*.pem
+Course_Github/

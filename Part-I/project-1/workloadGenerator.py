@@ -76,7 +76,7 @@ print("Waiting ... ")
 while True:
     print(".")
     test_duration = time.time() - test_start_time
-    if num_request == (responses + err_responses) or test_duration > 300:
+    if num_request == (responses + err_responses) or test_duration > 10:
         print(f"+++++ Test Result Statistics +++++")
         print(f"Total number of requests: {num_request}")
         print(f"Total number of requests completed successfully: {responses}")
