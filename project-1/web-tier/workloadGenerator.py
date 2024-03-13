@@ -42,7 +42,7 @@ def send_one_request(image_path):
 
         # Print error message if failed
         if response.status_code != 200:
-            print('sendErr: '+r.url)
+            print('sendErr: '+response.url)
             err_responses += 1
         else:
             filename = image_path.split('/')[-1]
