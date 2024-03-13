@@ -4,6 +4,7 @@ const path = require("path");
 require("dotenv").config({
   path: `${__dirname}/../.env`,
 });
+
 const AWS = require("aws-sdk");
 AWS.config.update({
   region: process.env.REGION,
@@ -21,10 +22,12 @@ const adjustInstanceCount = async () => {
       // Scale up to 20 instances
       console.log("Scaling up to 20 instances");
       // Implement logic to spawn instances (not provided here)
-    } else if (queueLength <= 5) {
+    } else if (queueLength >= 5) {
       // Scale down to 1 instance
       console.log("Scaling down to 1 instance");
       // Implement logic to terminate instances (not provided here)
+    } else if (queueLength <= 0) {
+      onsole.log("Scaling down to 1 instance");
     }
   } catch (error) {
     console.error("Error adjusting instance count:", error);

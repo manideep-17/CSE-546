@@ -25,24 +25,6 @@ app.use(express.json());
 const storage = multer.memoryStorage(); // Store the file in memory
 const upload = multer({ storage: storage });
 
-// let data = fs.readFileSync(
-//   path.join(`${__dirname}`, "/data/classification_results.csv"),
-//   "utf8"
-// );
-// data = data.split("\n");
-// let classification = {};
-// for (let i = 0; i < data.length; i++) {
-//   let fileName = data[i].split(",")[0];
-//   let value = data[i].split(",")[1].trim();
-//   classification[fileName] = value;
-// }
-
-// const classifer = (req, res) => {
-//   let { originalname: file } = req.file;
-//   file = file.split(".")[0];
-//   res.status(200).send(`${file}:${classification[file]}`);
-// };
-
 const pushToSQS = (req, res) => {
   let { originalname: file } = req.file;
   file = file.split(".")[0];
