@@ -85,7 +85,6 @@ const receiveAndProcessMessages = async () => {
 const startPolling = async () => {
   while (true) {
     await receiveAndProcessMessages();
-    break; // remove during deployment
   }
 };
 

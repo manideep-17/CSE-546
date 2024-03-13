@@ -10,6 +10,8 @@ AWS.config.update({
   region: process.env.REGION,
 });
 
+const MAX_INSTANCES = 20;
+const MAX_CONCURRENT_REQUESTS = 100;
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 
 const adjustInstanceCount = async () => {
@@ -18,16 +20,24 @@ const adjustInstanceCount = async () => {
     console.log(`Queue length: ${queueLength}`);
 
     // Adjust the instance count based on the queue length
-    if (queueLength >= 70) {
-      // Scale up to 20 instances
-      console.log("Scaling up to 20 instances");
+    if (queueLength >= MAX_CONCURRENT_REQUESTS) {
+      // Scale up to the maximum number of instances
+      console.log(`Scaling up to ${MAX_INSTANCES} instances`);
       // Implement logic to spawn instances (not provided here)
-    } else if (queueLength >= 5) {
-      // Scale down to 1 instance
-      console.log("Scaling down to 1 instance");
+    } else if (queueLength > 0) {
+      // Calculate the desired number of instances based on the queue length
+      const desiredInstances = Math.ceil(
+        queueLength / (MAX_CONCURRENT_REQUESTS / MAX_INSTANCES)
+      );
+      console.log(
+        `Desired instances based on queue length: ${desiredInstances}`
+      );
+      // Implement logic to adjust the number of instances (spawn/terminate instances) accordingly
+      // For example, compare the desired instances with the current number of instances and spawn/terminate instances accordingly
+    } else {
+      // No requests in the queue, scale down to 0 instances
+      console.log("Scaling down to 0 instances");
       // Implement logic to terminate instances (not provided here)
-    } else if (queueLength <= 0) {
-      onsole.log("Scaling down to 1 instance");
     }
   } catch (error) {
     console.error("Error adjusting instance count:", error);
