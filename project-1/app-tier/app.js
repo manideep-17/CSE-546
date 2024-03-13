@@ -12,6 +12,8 @@ AWS.config.update({
 });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 
+const execAsync = promisify(exec);
+
 const deleteMessage = async (receiptHandle) => {
   try {
     const deleteParams = {
