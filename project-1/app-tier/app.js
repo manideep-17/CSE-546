@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
+const { promisify } = require("util");
 
 require("dotenv").config({
   path: `${__dirname}/../.env`,
