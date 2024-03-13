@@ -26,6 +26,19 @@ const deleteMessage = async (receiptHandle) => {
   }
 };
 
+const pushToSQS = async (message) => {
+  try {
+    const params = {
+      QueueUrl: process.env.RESPONSE_QUEUE,
+      MessageBody: JSON.stringify(message),
+    };
+    await sqs.sendMessage(params).promise();
+  } catch {
+    console.error("Error pushing message to SQS:", error);
+    throw error;
+  }
+};
+
 const receiveAndProcessMessages = async () => {
   try {
     const params = {
@@ -39,9 +52,22 @@ const receiveAndProcessMessages = async () => {
       data.Messages.forEach(async (message) => {
         const messageBody = JSON.parse(message.Body);
         console.log("Received Message:", messageBody);
-        const { file } = messageBody;
-        // TODO: Add your processing logic here
+        const { file, uuid } = messageBody;
 
+        const command = `python3 /home/ubuntu/model/face_recognition.py /home/ubuntu/face_images_1000/${file}`;
+        const { stdout, stderr } = await execAsync(command);
+
+        if (stderr) {
+          throw new Error(`Error output: ${stderr}`);
+        }
+
+        console.log("Result:");
+        console.log(stdout);
+        const response = {
+          uuid,
+          response: stdout,
+        };
+        await pushToSQS(response);
         // Delete the received message from the queue (if needed)
         await deleteMessage(message.ReceiptHandle);
       });
@@ -56,6 +82,7 @@ const receiveAndProcessMessages = async () => {
 const startPolling = async () => {
   while (true) {
     await receiveAndProcessMessages();
+    break; // remove during deployment
   }
 };
 
