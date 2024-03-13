@@ -1,0 +1,18 @@
+{
+  "name": "project-1-app-tier",
+  "version": "1.0.0",
+  "description": "This is the web tier for Project 1. The app tier has the ML model for the image recognition. It polls SQS queue, updates S3, puts the reponse back in SQS. ",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "keywords": [
+    "cloud"
+  ],
+  "author": "Manideep",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1574.0",
+    "dotenv": "^16.4.5"
+  }
+}
