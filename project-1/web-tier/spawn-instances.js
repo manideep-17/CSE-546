@@ -13,14 +13,6 @@ AWS.config.update({
 const ec2 = new AWS.EC2();
 
 var params = {
-  BlockDeviceMappings: [
-    {
-      DeviceName: "/dev/sdh",
-      Ebs: {
-        VolumeSize: 100,
-      },
-    },
-  ],
   ImageId: "ami-abc12345",
   InstanceType: "t2.micro",
   KeyName: "my-key-pair",
