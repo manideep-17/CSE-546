@@ -27,7 +27,6 @@ const upload = multer({ storage: storage });
 
 const pushToSQS = (req, res) => {
   let { originalname: file } = req.file;
-  file = file.split(".")[0];
   const params = {
     QueueUrl: process.env.REQUEST_QUEUE,
     MessageBody: JSON.stringify({ file, uuid: uuidv4() }),

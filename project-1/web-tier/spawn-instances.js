@@ -9,34 +9,39 @@ const AWS = require("aws-sdk");
 AWS.config.update({
   region: process.env.REGION,
 });
-// Create EC2 service object
 const ec2 = new AWS.EC2();
 
-var params = {
-  ImageId: "ami-abc12345",
-  InstanceType: "t2.micro",
-  KeyName: "my-key-pair",
-  MaxCount: 1,
-  MinCount: 1,
-  SecurityGroupIds: ["sg-1a2b3c4d"],
-  SubnetId: "subnet-6e7f829e",
-  TagSpecifications: [
-    {
-      ResourceType: "instance",
-      Tags: [
-        {
-          Key: "tier",
-          Value: "app-tier",
-        },
-      ],
+exports.spawnInstances = async (maxCount) => {
+  var params = {
+    ImageId: "ami-0bbc90ae444727bc0",
+    InstanceType: "t2.micro",
+    KeyName: "CSE-546-key-pair",
+    MaxCount: maxCount,
+    MinCount: 1,
+    SecurityGroupIds: ["sg-0ab269ed85a1f9ecc"],
+    SubnetId: "subnet-00fd16293f5f98b21",
+    IamInstanceProfile: {
+      Arn: "arn:aws:iam::975049889152:instance-profile/EC2-SQS-FullAccess",
     },
-  ],
+    TagSpecifications: [
+      {
+        ResourceType: "instance",
+        Tags: [
+          {
+            Key: "tier",
+            Value: "app-tier",
+          },
+          {
+            Key: "Name",
+            Value: "app-tier-instance-duplicate",
+          },
+        ],
+      },
+    ],
+  };
+  try {
+    await ec2.runInstances(params).promise();
+  } catch (error) {
+    console.error("Error spawning instances:", error);
+  }
 };
-ec2.runInstances(params, function (err, data) {
-  if (err) console.log(err, err.stack); // an error occurred
-  else console.log(data); // successful response
-  /*
-   data = {
-   }
-   */
-});
