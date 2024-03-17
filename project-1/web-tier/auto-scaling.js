@@ -11,8 +11,11 @@ AWS.config.update({
 });
 
 const { getQueueLength } = require("./sqs");
-const { getAppTierInstances } = require("./ec2");
-const { spawnInstances } = require("./spawn-instances");
+const {
+  getAppTierInstances,
+  terminateInstances,
+  spawnInstances,
+} = require("./ec2");
 
 const MAX_INSTANCES = 20;
 const MAX_CONCURRENT_REQUESTS = 100;
@@ -22,19 +25,18 @@ const adjustInstanceCount = async () => {
   try {
     const queueLength = await getQueueLength();
     console.log(`Queue length: ${queueLength}`);
-
+    const instances = await getAppTierInstances();
+    console.log(`App Tier Instances: ${instances}`);
     if (queueLength > 0) {
-      const instances = await getAppTierInstances();
-      console.log(`App Tier Instances: ${instances}`);
-
       if (queueLength >= 50) {
-        const required = MAX_INSTANCES - instances;
+        const required = MAX_INSTANCES - instances.length;
         if (required > 0) await spawnInstances(required);
       } else if (queueLength > 0) {
-        const required = MAX_INSTANCES / 2 - instances;
+        const required = MAX_INSTANCES / 2 - instances.length;
         if (required > 0) await spawnInstances(required);
       }
-    } else {
+    } else if (instances.length > 0) {
+      // terminateInstances(instances);
       console.log("Scaling down to 0 instances");
     }
   } catch (error) {
