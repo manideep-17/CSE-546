@@ -7,7 +7,6 @@ require("dotenv").config({
   path: `${__dirname}/../.env`,
 });
 const AWS = require("aws-sdk");
-console.log(process.env.REGION);
 AWS.config.update({
   region: process.env.REGION,
 });
@@ -46,9 +45,9 @@ const receiveAndProcessMessages = async () => {
   try {
     const params = {
       QueueUrl: process.env.REQUEST_QUEUE,
-      MaxNumberOfMessages: 5,
-      WaitTimeSeconds: 10,
-      VisibilityTimeout: 60,
+      MaxNumberOfMessages: 1,
+      WaitTimeSeconds: 15,
+      VisibilityTimeout: 30,
     };
 
     const data = await sqs.receiveMessage(params).promise();
