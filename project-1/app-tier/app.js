@@ -46,7 +46,9 @@ const receiveAndProcessMessages = async () => {
   try {
     const params = {
       QueueUrl: process.env.REQUEST_QUEUE,
-      MaxNumberOfMessages: 1, // Change this value based on your requirement
+      MaxNumberOfMessages: 5,
+      WaitTimeSeconds: 10,
+      VisibilityTimeout: 60,
     };
 
     const data = await sqs.receiveMessage(params).promise();
