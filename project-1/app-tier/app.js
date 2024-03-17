@@ -52,7 +52,7 @@ const receiveAndProcessMessages = async () => {
     };
 
     const data = await sqs.receiveMessage(params).promise();
-
+    print({ data });
     if (data.Messages) {
       data.Messages.forEach(async (message) => {
         const messageBody = JSON.parse(message.Body);
