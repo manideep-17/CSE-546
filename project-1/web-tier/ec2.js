@@ -53,7 +53,7 @@ exports.getAppTierInstances = async () => {
   }
 };
 
-exports.spawnInstances = async (maxCount) => {
+exports.spawnInstances = async (count, maxCount) => {
   console.log("Spawning", maxCount);
   const userDataScript = `#!/bin/bash
   cd /home/ubuntu/CSE-546/project-1/app-tier

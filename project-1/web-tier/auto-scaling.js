@@ -52,9 +52,13 @@ const adjustInstanceCount = async () => {
   }
 };
 
-// Function to get the length of the SQS queue
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const pollingInterval = 5000;
-setInterval(async () => {
-  await adjustInstanceCount();
-}, pollingInterval);
+const startPolling = async () => {
+  while (true) {
+    await adjustInstanceCount();
+    await sleep(10000);
+  }
+};
+
+startPolling();
