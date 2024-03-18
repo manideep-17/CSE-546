@@ -8,10 +8,6 @@ require("dotenv").config({
 const AWS = require("aws-sdk");
 AWS.config.update({
   region: process.env.REGION,
-  credentials: {
-    accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
-  },
 });
 
 const { getQueueLength } = require("./sqs");
@@ -24,6 +20,8 @@ const {
 const MAX_INSTANCES = 20;
 const MAX_CONCURRENT_REQUESTS = 100;
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
+
+let consecutiveZeroQueueLengthCount = 0;
 
 const adjustInstanceCount = async () => {
   try {
@@ -41,8 +39,13 @@ const adjustInstanceCount = async () => {
         if (required > 0) await spawnInstances(required);
       }
     } else if (instances.length > 0) {
-      // terminateInstances(instances);
-      console.log("Scaling down to 0 instances");
+      consecutiveZeroQueueLengthCount++;
+      if (consecutiveZeroQueueLengthCount == 2) {
+        console.log("Terminating");
+        terminateInstances(instances);
+        console.log("Scaling down to 0 instances");
+        consecutiveZeroQueueLengthCount = 0;
+      }
     }
   } catch (error) {
     console.error("Error adjusting instance count:", error);
