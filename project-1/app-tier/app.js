@@ -71,8 +71,10 @@ const receiveAndProcessMessages = async () => {
     };
 
     const data = await sqs.receiveMessage(params).promise();
+    console.log(JSON.stringify(data.Messages));
     if (data.Messages) {
-      data.Messages.forEach(async (message) => {
+      for (let i = 0; i < data.Messages.length; i++) {
+        let message = data.Messages[i];
         const messageBody = JSON.parse(message.Body);
         console.log("Received Message:", messageBody);
         const { file, uuid } = messageBody;
@@ -107,7 +109,7 @@ const receiveAndProcessMessages = async () => {
         };
         await pushToSQS(response);
         await deleteMessage(message.ReceiptHandle);
-      });
+      }
     } else {
       console.log("No messages received");
     }
