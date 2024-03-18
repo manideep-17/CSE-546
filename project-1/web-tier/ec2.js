@@ -61,7 +61,7 @@ exports.spawnInstances = async (maxCount) => {
 
   for (let i = 1; i <= maxCount; i++) {
     const params = {
-      ImageId: "ami-ami-0cc231f1a6f313204",
+      ImageId: "ami-0cc231f1a6f313204",
       InstanceType: "t2.micro",
       KeyName: "CSE546-key-pair",
       MaxCount: maxCount,
