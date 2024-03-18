@@ -40,7 +40,7 @@ const adjustInstanceCount = async () => {
       }
     } else if (instances.length > 0) {
       consecutiveZeroQueueLengthCount++;
-      if (consecutiveZeroQueueLengthCount == 2) {
+      if (consecutiveZeroQueueLengthCount == 4) {
         console.log("Terminating");
         terminateInstances(instances);
         console.log("Scaling down to 0 instances");
