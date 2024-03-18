@@ -53,23 +53,19 @@ exports.getAppTierInstances = async () => {
   }
 };
 
-const spawnInstances = async (maxCount) => {
+exports.spawnInstances = async (maxCount) => {
   const userDataScript = `#!/bin/bash
   cd /home/ubuntu/CSE-546/project-1/app-tier
   pm2 start app.js
   `;
 
   const params = {
-    ImageId: "ami-0a92f00ff18ab3e27",
+    ImageId: "ami-00fbb26532d88db62",
     InstanceType: "t2.micro",
-    KeyName: "CSE-546-key-pair",
+    KeyName: "CSE546-key-pair",
     MaxCount: maxCount,
     MinCount: 1,
-    SecurityGroupIds: ["sg-0ab269ed85a1f9ecc"],
-    SubnetId: "subnet-00fd16293f5f98b21",
-    IamInstanceProfile: {
-      Arn: "arn:aws:iam::975049889152:instance-profile/EC2-SQS-FullAccess",
-    },
+    SecurityGroupIds: ["sg-055f709abafd3233b"],
     TagSpecifications: [
       {
         ResourceType: "instance",
@@ -94,4 +90,4 @@ const spawnInstances = async (maxCount) => {
   }
 };
 
-spawnInstances(10);
+// spawnInstances(10);
