@@ -60,7 +60,7 @@ exports.spawnInstances = async (count, maxCount) => {
   pm2 start app.js
   `;
 
-  for (let i = 1; i <= maxCount; i++) {
+  for (let i = count + 1; i <= maxCount; i++) {
     const params = {
       ImageId: "ami-0cc231f1a6f313204",
       InstanceType: "t2.micro",

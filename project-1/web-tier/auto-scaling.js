@@ -32,11 +32,11 @@ const adjustInstanceCount = async () => {
     if (queueLength > 0) {
       if (queueLength >= 30) {
         const required = MAX_INSTANCES - instances.length;
-        if (required > 0) await spawnInstances(required);
+        if (required > 0) await spawnInstances(instances, required);
       } else if (queueLength > 0) {
         const required = MAX_INSTANCES / 2 - instances.length;
         // const required = 1 - instances.length;
-        if (required > 0) await spawnInstances(required);
+        if (required > 0) await spawnInstances(instances, required);
       }
     } else if (instances.length > 0) {
       consecutiveZeroQueueLengthCount++;
