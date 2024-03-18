@@ -64,7 +64,7 @@ exports.spawnInstances = async (maxCount) => {
       ImageId: "ami-0cc231f1a6f313204",
       InstanceType: "t2.micro",
       KeyName: "CSE546-key-pair",
-      MaxCount: maxCount,
+      MaxCount: 1,
       MinCount: 1,
       SecurityGroupIds: ["sg-055f709abafd3233b"],
       TagSpecifications: [
