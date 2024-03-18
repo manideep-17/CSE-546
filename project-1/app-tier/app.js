@@ -88,12 +88,8 @@ const receiveAndProcessMessages = async () => {
           throw new Error(`Error output: ${stderr}`);
         }
 
-        let data = await fs.readFile(filePath);
-        await uploadToS3(
-          process.env.IN_S3_BUCKET_ARN,
-          file.split(".")[0],
-          data
-        );
+        let img = await fs.readFile(filePath);
+        await uploadToS3(process.env.IN_S3_BUCKET_ARN, file.split(".")[0], img);
 
         await uploadToS3(
           process.env.OUT_S3_BUCKET_ARN,
