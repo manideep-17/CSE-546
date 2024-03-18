@@ -19,7 +19,7 @@ AWS.config.update({
 
 const { fetchResponses, deleteMessage } = require("./sqs");
 
-const port = 3000;
+const port = 8000;
 const app = express();
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 

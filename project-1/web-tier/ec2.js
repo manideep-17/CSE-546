@@ -59,34 +59,36 @@ exports.spawnInstances = async (maxCount) => {
   pm2 start app.js
   `;
 
-  const params = {
-    ImageId: "ami-00fbb26532d88db62",
-    InstanceType: "t2.micro",
-    KeyName: "CSE546-key-pair",
-    MaxCount: maxCount,
-    MinCount: 1,
-    SecurityGroupIds: ["sg-055f709abafd3233b"],
-    TagSpecifications: [
-      {
-        ResourceType: "instance",
-        Tags: [
-          {
-            Key: "tier",
-            Value: "app-tier",
-          },
-          {
-            Key: "Name",
-            Value: "app-tier-instance-duplicate",
-          },
-        ],
-      },
-    ],
-    UserData: Buffer.from(userDataScript).toString("base64"),
-  };
-  try {
-    await ec2.runInstances(params).promise();
-  } catch (error) {
-    console.error("Error spawning instances:", error);
+  for (let i = 1; i <= maxCount; i++) {
+    const params = {
+      ImageId: "ami-ami-0cc231f1a6f313204",
+      InstanceType: "t2.micro",
+      KeyName: "CSE546-key-pair",
+      MaxCount: maxCount,
+      MinCount: 1,
+      SecurityGroupIds: ["sg-055f709abafd3233b"],
+      TagSpecifications: [
+        {
+          ResourceType: "instance",
+          Tags: [
+            {
+              Key: "tier",
+              Value: "app-tier",
+            },
+            {
+              Key: "Name",
+              Value: `app-tier-instance-${i}`,
+            },
+          ],
+        },
+      ],
+      UserData: Buffer.from(userDataScript).toString("base64"),
+    };
+    try {
+      await ec2.runInstances(params).promise();
+    } catch (error) {
+      console.error("Error spawning instances:", error);
+    }
   }
 };
 
