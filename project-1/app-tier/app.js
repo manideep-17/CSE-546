@@ -54,7 +54,7 @@ const uploadToS3 = async (bucket, key, body) => {
     Body: body,
   };
   try {
-    await s3.upload(params);
+    await s3.upload(params).promise();
   } catch (err) {
     console.error("Error uploading to S3:", error);
     throw error;

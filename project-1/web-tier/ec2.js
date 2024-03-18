@@ -8,6 +8,10 @@ require("dotenv").config({
 const AWS = require("aws-sdk");
 AWS.config.update({
   region: process.env.REGION,
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  },
 });
 const ec2 = new AWS.EC2();
 
@@ -56,7 +60,7 @@ const spawnInstances = async (maxCount) => {
   `;
 
   const params = {
-    ImageId: "ami-08af1dd6cedec6fa5",
+    ImageId: "ami-0a92f00ff18ab3e27",
     InstanceType: "t2.micro",
     KeyName: "CSE-546-key-pair",
     MaxCount: maxCount,
@@ -90,4 +94,4 @@ const spawnInstances = async (maxCount) => {
   }
 };
 
-spawnInstances(1);
+spawnInstances(10);
