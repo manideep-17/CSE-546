@@ -13,6 +13,8 @@ AWS.config.update({
   region: process.env.REGION,
 });
 
+const { fetchResponses, deleteMessage } = require("./sqs");
+
 const port = 3000;
 const app = express();
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
@@ -25,20 +27,45 @@ app.use(express.json());
 const storage = multer.memoryStorage(); // Store the file in memory
 const upload = multer({ storage: storage });
 
-const pushToSQS = (req, res) => {
+let responses = {};
+const fetchAndUpdateResponse = async () => {
+  try {
+    responses = await fetchResponses(responses);
+    console.log(responses);
+  } catch (error) {
+    console.error("Error fetching responses:", error);
+  }
+};
+
+setInterval(fetchAndUpdateResponse, 5000);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const pushToSQS = async (req, res) => {
   let { originalname: file } = req.file;
+  let uuid = uuidv4();
   const params = {
     QueueUrl: process.env.REQUEST_QUEUE,
-    MessageBody: JSON.stringify({ file, uuid: uuidv4() }),
+    MessageBody: JSON.stringify({ file, uuid }),
   };
-  sqs.sendMessage(params, (err, data) => {
-    if (err) {
-      console.log(err);
-      res.status(400).send(`Failed to push to SQS: ${file}.`);
-    } else {
-      res.status(200).send(`Pushed ${file} to SQS. Awaiting response.`);
+  try {
+    await sqs.sendMessage(params).promise();
+    await sleep(3000);
+    while (true) {
+      if (responses[uuid]) {
+        await deleteMessage(
+          process.env.RESPONSE_QUEUE,
+          responses[uuid].receiptHandle
+        );
+        console.log("found response", JSON.stringify(responses[uuid]));
+        const recognition = responses[uuid].response;
+        delete responses[uuid];
+        return res.status(200).send(`${file.split(".")[0]}:${recognition}`);
+      }
+      await sleep(1000);
     }
-  });
+  } catch (err) {
+    res.status(400).send(`Failed to push to SQS: ${file}.`);
+  }
 };
 
 app.post("/", upload.single("inputFile"), pushToSQS);

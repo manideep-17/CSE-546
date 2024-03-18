@@ -28,11 +28,12 @@ const adjustInstanceCount = async () => {
     const instances = await getAppTierInstances();
     console.log(`App Tier Instances: ${instances}`);
     if (queueLength > 0) {
-      if (queueLength >= 50) {
+      if (queueLength >= 30) {
         const required = MAX_INSTANCES - instances.length;
         if (required > 0) await spawnInstances(required);
       } else if (queueLength > 0) {
         const required = MAX_INSTANCES / 2 - instances.length;
+        // const required = 1 - instances.length;
         if (required > 0) await spawnInstances(required);
       }
     } else if (instances.length > 0) {
@@ -46,7 +47,7 @@ const adjustInstanceCount = async () => {
 
 // Function to get the length of the SQS queue
 
-const pollingInterval = 2000;
+const pollingInterval = 5000;
 setInterval(async () => {
   await adjustInstanceCount();
 }, pollingInterval);

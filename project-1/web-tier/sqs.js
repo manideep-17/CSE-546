@@ -26,3 +26,45 @@ exports.getQueueLength = async () => {
     return 0;
   }
 };
+
+exports.fetchResponses = async (input) => {
+  const params = {
+    QueueUrl: process.env.RESPONSE_QUEUE,
+    MaxNumberOfMessages: 10,
+    WaitTimeSeconds: 10,
+    VisibilityTimeout: 45,
+  };
+  try {
+    const data = await sqs.receiveMessage(params).promise();
+    const messages = data.Messages || [];
+    console.log(JSON.stringify({ messages }));
+
+    for (const message of messages) {
+      const messageBody = JSON.parse(message.Body); // Assuming message body is JSON
+      const { uuid, response } = messageBody; // Destructure uuid, response, and ReceiptHandle from messageBody
+      console.log({ uuid, response });
+      input[uuid] = {
+        response: response.trim(),
+        receiptHandle: message.ReceiptHandle,
+      };
+    }
+    return input;
+  } catch (error) {
+    console.error("Error polling SQS:", error);
+    return response;
+  }
+};
+
+exports.deleteMessage = async (queueURL, receiptHandle) => {
+  try {
+    const deleteParams = {
+      QueueUrl: queueURL,
+      ReceiptHandle: receiptHandle,
+    };
+
+    const data = await sqs.deleteMessage(deleteParams).promise();
+    console.log("Message deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting message:", error);
+  }
+};

@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const { exec } = require("child_process");
 const { promisify } = require("util");
@@ -9,6 +9,10 @@ require("dotenv").config({
 const AWS = require("aws-sdk");
 AWS.config.update({
   region: process.env.REGION,
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  },
 });
 const sqs = new AWS.SQS({ apiVersion: "2012-11-05" });
 
@@ -41,6 +45,22 @@ const pushToSQS = async (message) => {
   }
 };
 
+const s3 = new AWS.S3();
+
+const uploadToS3 = async (bucket, key, body) => {
+  const params = {
+    Bucket: bucket,
+    Key: key,
+    Body: body,
+  };
+  try {
+    await s3.upload(params);
+  } catch (err) {
+    console.error("Error uploading to S3:", error);
+    throw error;
+  }
+};
+
 const receiveAndProcessMessages = async () => {
   try {
     const params = {
@@ -51,28 +71,41 @@ const receiveAndProcessMessages = async () => {
     };
 
     const data = await sqs.receiveMessage(params).promise();
-    console.log({ data });
     if (data.Messages) {
       data.Messages.forEach(async (message) => {
         const messageBody = JSON.parse(message.Body);
         console.log("Received Message:", messageBody);
         const { file, uuid } = messageBody;
 
-        const command = `python3 /home/ubuntu/model/face_recognition.py /home/ubuntu/face_images_1000/${file}`;
+        const filePath = `/home/ubuntu/face_images_1000/${file}`;
+
+        const command = `python3 /home/ubuntu/model/face_recognition.py ${filePath}`;
         const { stdout, stderr } = await execAsync(command);
 
         if (stderr) {
           throw new Error(`Error output: ${stderr}`);
         }
 
-        console.log("Result:");
+        let data = await fs.readFile(filePath);
+        await uploadToS3(
+          process.env.IN_S3_BUCKET_ARN,
+          file.split(".")[0],
+          data
+        );
+
+        await uploadToS3(
+          process.env.OUT_S3_BUCKET_ARN,
+          file.split(".")[0],
+          stdout.trim()
+        );
+
         console.log(stdout);
         const response = {
           uuid,
-          response: stdout,
+          file,
+          response: `${stdout}`,
         };
         await pushToSQS(response);
-        // Delete the received message from the queue (if needed)
         await deleteMessage(message.ReceiptHandle);
       });
     } else {

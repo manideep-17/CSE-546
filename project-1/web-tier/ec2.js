@@ -49,9 +49,14 @@ exports.getAppTierInstances = async () => {
   }
 };
 
-exports.spawnInstances = async (maxCount) => {
-  var params = {
-    ImageId: "ami-02baeedfad2d59fb0",
+const spawnInstances = async (maxCount) => {
+  const userDataScript = `#!/bin/bash
+  cd /home/ubuntu/CSE-546/project-1/app-tier
+  pm2 start app.js
+  `;
+
+  const params = {
+    ImageId: "ami-08af1dd6cedec6fa5",
     InstanceType: "t2.micro",
     KeyName: "CSE-546-key-pair",
     MaxCount: maxCount,
@@ -76,6 +81,7 @@ exports.spawnInstances = async (maxCount) => {
         ],
       },
     ],
+    UserData: Buffer.from(userDataScript).toString("base64"),
   };
   try {
     await ec2.runInstances(params).promise();
@@ -83,3 +89,5 @@ exports.spawnInstances = async (maxCount) => {
     console.error("Error spawning instances:", error);
   }
 };
+
+spawnInstances(1);
